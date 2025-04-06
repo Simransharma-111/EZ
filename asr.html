@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Services Slider with Special Features</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(to bottom, #0d1c2e, #1a3045);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        /* Slider Container */
+        .slider-container {
+            width: 100%;
+            max-width: 1200px;
+            position: relative;
+            padding: 20px;
+            perspective: 1000px;
+        }
+
+        /* Slides */
+        .slides {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            transform-style: preserve-3d;
+        }
+
+        .slide {
+            position: absolute;
+            width: 450px;
+            height: 350px;
+            background: linear-gradient(to bottom, #2a2a2a, #1a1a1a);
+            border-radius: 10px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+            padding: 30px;
+            color: white;
+            text-align: center;
+            transition: all 0.5s ease;
+            transform: translateX(-50%) scale(0.8);
+            opacity: 0.5;
+            left: 50%;
+            top: 0;
+            z-index: 1;
+            overflow: hidden; /* Prevent content from spilling out */
+        }
+
+        .slide.active {
+            transform: translateX(-50%) scale(1);
+            opacity: 1;
+            z-index: 10;
+        }
+
+        .slide.prev {
+            transform: translateX(-90%) scale(0.8);
+            z-index: 5;
+            opacity: 0.7;
+        }
+
+        .slide.next {
+            transform: translateX(-10%) scale(0.8);
+            z-index: 5;
+            opacity: 0.7;
+        }
+
+        /* Content Heading */
+        .slide h2 {
+            margin-bottom: 30px;
+            position: relative;
+            font-size: 28px;
+            font-weight: 500;
+            color: white;
+            letter-spacing: 0.5px;
+        }
+
+        .slide h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 2px;
+            background-color: #ffffff;
+        }
+
+        /* Service Grid */
+        .service-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 30px;
+            max-height: 230px; /* Limit height to avoid overflow */
+            overflow-y: auto; /* Add scroll if needed */
+        }
+
+        /* Custom scrollbar for the service grid */
+        .service-grid::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .service-grid::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .service-grid::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+        }
+
+        .service-grid::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .service-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .service-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .service-icon {
+            width: 60px;
+            height: 60px;
+            background-color: #f5f5f5;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .service-icon::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 15px;
+            height: 15px;
+            background-color: #ff8900;
+            border-radius: 0 0 0 5px;
+        }
+
+        .service-icon span {
+            font-weight: bold;
+            font-size: 24px;
+            color: #333;
+        }
+
+        .service-title {
+            font-size: 14px;
+            margin-top: 8px;
+            text-align: center;
+            font-weight: bold;
+            line-height: 1.2;
+        }
+
+        /* Navigation Dots */
+        .slider-nav {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .nav-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.3);
+            margin: 0 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-dot.active {
+            background-color: white;
+            transform: scale(1.2);
+        }
+
+        /* Arrow Navigation */
+        .slider-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: white;
+            font-size: 20px;
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        .slider-arrow:hover {
+            background-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .arrow-prev {
+            left: 20px;
+        }
+
+        .arrow-next {
+            right: 20px;
+        }
+
+        /* Contact section */
+        .contact-section {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            max-width: 800px;
+        }
+
+        .contact-heading {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .contact-subheading {
+            font-size: 16px;
+            margin-bottom: 25px;
+            opacity: 0.9;
+        }
+
+        .contact-button {
+            background-color: #ff8900;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .contact-button:hover {
+            background-color: #e67a00;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 137, 0, 0.3);
+        }
+    </style>
+</head>
+<style>
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            display: flex;
+            width: 100%;
+            max-width: 750px;
+            background-color: white;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+
+        .modal-left {
+            width: 40%;
+            background: linear-gradient(to bottom, #0d1c2e, #1a3045);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .modal-right {
+            width: 60%;
+            padding: 30px;
+            position: relative;
+        }
+
+        .modal-heading {
+            font-size: 26px;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .modal-subheading {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 16px;
+            line-height: 1.4;
+        }
+
+        .modal-icons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .modal-icon {
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            color: #333;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23444' viewBox='0 0 16 16'%3E%3Cpath d='M8 12l-6-6h12z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 12px;
+        }
+
+        .phone-input {
+            display: flex;
+        }
+
+        .country-code {
+            width: 80px;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        .country-code img {
+            width: 20px;
+            height: 15px;
+            margin-right: 5px;
+        }
+
+        .phone-number {
+            flex: 1;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 5px 10px;
+            background-color: #f0f0f0;
+            border-radius: 20px;
+            color: #333;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        .tag-close {
+            margin-left: 5px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: start;
+            margin-bottom: 20px;
+        }
+
+        .checkbox-group input {
+            margin-top: 3px;
+            margin-right: 10px;
+        }
+
+        .checkbox-group label {
+            color: #555;
+            font-size: 14px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #ff8900;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            background-color: #e67a00;
+        }
+
+        .highlighted-icon {
+            background-color: #0078ff;
+        }
+
+        /* Special Features Section Styles */
+        .special-features-section {
+            background: linear-gradient(to bottom right, #f5f7fa, #e6ebf2);
+            padding: 60px 0;
+            color: #0a2540;
+            margin-top: 50px;
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .special-features-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .special-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .special-header h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #0a2540;
+        }
+
+        .ez-rule-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 40px;
+        }
+
+        .timeline-container {
+            flex: 0 0 45%;
+        }
+
+        .timeline-header {
+            margin-bottom: 30px;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #0a2540;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: #0a2540;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: 60px;
+            padding-left: 30px;
+        }
+
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -6px;
+            top: 12px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #0a2540;
+        }
+
+        .timeline-time {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: #0a2540;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-end;
+            line-height: 0.9;
+        }
+
+        .timeline-time span {
+            font-size: 1.1rem;
+            font-weight: 400;
+            margin-left: 5px;
+            margin-bottom: 8px;
+        }
+
+        .timeline-action {
+            background-color: #e2e8f0;
+            padding: 12px 20px;
+            border-radius: 8px;
+            display: inline-block;
+            font-weight: 500;
+            color: #0a2540;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .timeline-action:hover {
+            background-color: #d1d8e0;
+            transform: translateY(-2px);
+        }
+
+        .features-grid {
+            flex: 0 0 50%;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .feature-card {
+            background-color: #0a2540;
+            border-radius: 12px;
+            color: white;
+            padding: 30px 20px;
+            position: relative;
+            height: 100%;
+            min-height: 140px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .feature-card h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .feature-card i {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .feature-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        /* WhatsApp Button */
+        .whatsapp-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            background-color: #25D366;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 25px;
+            text-decoration: none;
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+            z-index: 99;
+            font-size: 0.9rem;
+        }
+
+        .whatsapp-button i {
+            font-size: 20px;
+            margin-left: 5px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .slide {
+                width: 300px;
+                height: 400px;
+                padding: 20px;
+            }
+
+            .service-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+                max-height: 280px;
+            }
+
+            .arrow-prev {
+                left: 10px;
+            }
+
+            .arrow-next {
+                right: 10px;
+            }
+
+            .contact-section {
+                padding: 15px;
+            }
+
+            .contact-heading {
+                font-size: 20px;
+            }
+
+            .contact-subheading {
+                font-size: 14px;
+            }
+
+            .contact-button {
+                padding: 10px 25px;
+                font-size: 14px;
+            }
+
+            .modal {
+                flex-direction: column;
+                max-width: 95%;
+            }
+
+            .modal-left, .modal-right {
+                width: 100%;
+            }
+
+            .modal-left {
+                padding: 20px;
+            }
+
+            .modal-right {
+                padding: 20px;
+            }
+
+            .modal-heading {
+                font-size: 22px;
+            }
+
+            .modal-subheading {
+                font-size: 14px;
+            }
+
+            .modal-icons {
+                display: none;
+            }
+
+            .ez-rule-container {
+                flex-direction: column;
+            }
+
+            .features-grid {
+                margin-top: 40px;
+            }
+
+            .special-header h2 {
+                font-size: 2rem;
+            }
+
+            .timeline-time {
+                font-size: 3rem;
+            }
+        }
+        
+    .header-container {
+        width: 100%;
+        background: linear-gradient(180deg, #071526 0%, #0f2a43 100%);
+        padding: var(--section-padding);
+        text-align: center;
+        padding-top: 3rem;
+        padding-bottom: 3rem;
+      }
+  
+      .main-title {
+        font-size: 2.2rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        text-align: center;
+        max-width: 900px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+  
+      .categories-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 2rem;
+        padding: 0 2rem;
+      }
+  
+      .category {
+        flex: 1;
+        text-align: center;
+        padding: 0 1rem;
+      }
+  
+      .category-title {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        color: var(--light-blue);
+        font-weight: 500;
+      }
+  
+      .language-section {
+        flex: 2;
+        margin: 0 auto;
+        max-width: 650px;
+        padding: 1rem 0;
+      }
+  
+      .language-title {
+        font-size: 1.4rem;
+        margin-bottom: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 600;
+      }
+  
+      .language-description {
+        font-size: 0.9rem;
+        max-width: 600px;
+        margin: 0 auto;
+        opacity: 0.9;
+        font-weight: 300;
+        line-height: 1.5;
+      }
+  
+      @media (max-width: 768px) {
+        .categories-container {
+          flex-direction: column;
+          gap: 1.5rem;
+        }
+  
+        .category {
+          margin-bottom: 1rem;
+        }
+  
+        .main-title {
+          font-size: 1.8rem;
+        }
+      }
+    </style>
+</head>
+<body>
+    <header class="header-container">
+        <h1 class="main-title">70+ Offerings that allow you to Focus on your core tasks</h1>
+    
+        <div class="categories-container">
+          <div class="category">
+            <h3 class="category-title">GRAPHICS & VIDEO</h3>
+          </div>
+    
+          <div class="language-section">
+            <h2 class="language-title">LANGUAGE & COMMUNICATION</h2>
+            <p class="language-description">Unlock the power of refined linguistics and expert communication to weave magic with words, from translation to creative writing</p>
+          </div>
+    
+          <div class="category">
+            <h3 class="category-title">RESEARCH & DATA</h3>
+          </div>
+        </div>
+      </header>
+    <div class="slider-container">
+        <div class="slides">
+            <!-- Content Creation Slide -->
+            <div class="slide active">
+                <h2>Content Creation</h2>
+                <div class="service-grid">
+                    <div class="service-item">
+                        <div class="service-icon">
+                            <span>BW</span>
+                        </div>
+                        <div class="service-title">Blog Writing</div>
+                    </div>
+                    <div class="service-item">
+                        <div class="service-icon">
+                            <span>AW</span>
+                        </div>
+                        <div class="service-title">Article Writing</div>
+                    </div>
+                    <div class="service-item">
+                        <div class="service-icon">
+                            <span>eC</span>
+                        </div>
+                        <div class="service-title">e-Commerce Content</div>
+                    </div>
+                    <div class="service-item">
+                        <div class="service-icon">
+                            <span>TW</span>
+                        </div>
+                        <div class="service-title">Technical Writing</div>
+                    </div>
+                    <div class="service-item">
+                        <div class="service-icon">
+                            <span>WP</span>
+                        </div>
+                        <div class="service-title">Writing Projects</div>
+                    </div>
+                    <div class="service-item">
+                        <div class="service-icon">
+                            <span>Cw</span>
+                        </div>
+                        <div class="service-title">Copywriting</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Processing Slide -->
+            <div class="slide next">
+                <h2>Data Processing</h2>
+                <div class="service-grid">
+                    <div class="service-item">
+                        <div class="service-icon">
+                            <span>SE</span>
+                        </div>
+                        <div class="service-title">Spreadsheet Engineering</div>
+                    </div>
+                    <div class="service-item">
+                        <div class="service-icon">
+                            <span>PD</span>
+                        </div>
+                        <div class="service-title">Process Digitization</div>
+                    </div>
+                    <div class="service-item">
+                        <div class="service-icon">
+                            <span>DD</span>
+                        </div>
+                        <div class="service-title">Document Digitization</div>
+                    </div>
+                    <div class="service-item">
+                        <div class="service-icon">
+                            <span>DB</span>
+                        </div>
+                        <div class="service-title">Dashboarding</div>
+                    </div>
+                    <div class="service-item">
+                        <div class="service-icon">
+                            <span>DV</span>
+                        </div>
+                        <div class="service-title">Data Visualization</div>
+                    </div>
+                    <div class="service-item">
+                        <div class="service-icon">
+                            <span>DS</span>
+                        </div>
+                        <div class="service-title">Data Strategy</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Research & Analytics Slide -->
+            <div class="slide">
+                <h2>Research & Analytics</h2>
+                <div class="service-grid">
+                    <div class="service-item">
+                        <div class="service-icon">
+                            <span>DR</span>
+                        </div>
+                        <div class="service-title">Desk Research</div>
+                    </div>
+                    <div class="service-item">
+                        <div class="service-icon">
+                            <span>PR</span>
+                        </div>
+                        <div class="service-title">Primary Research</div>
+                    </div>
+                    <div class="service-item">
+                        <div class="service-icon">
+                            <span>GS</span>
+                        </div>
+                        <div class="service-title">Global Surveys</div>
+                    </div>
+                    <div class="service-item">
+                        <div class="service-icon">
+                            <span>SA</span>
+                        </div>
+                        <div class="service-title">Sentiment Analysis</div>
+                    </div>
+                    <div class="service-item">
+                        <div class="service-icon">
+                            <span>EE</span>
+                        </div>
+                        <div class="service-title">Expert Engagement</div>
+                    </div>
+                    <div class="service-item">
+                        <div class="service-icon">
+                            <span>FG</span>
+                        </div>
+                        <div class="service-title">Focus Groups</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tech Development Slide -->
+            <div class="slide prev">
+                <h2>Tech Development</h2>
+                <div class="service-grid">
+                    <div class="service-item">
+                        <div class="service-icon">
+                            <span>WC</span>
+                        </div>
+                        <div class="service-title">Website Creation</div>
+                    </div>
+                    <div class="service-item">
+                        <div class="service-icon">
+                            <span>PD</span>
+                        </div>
+                        <div class="service-title">Product Documentation</div>
+                    </div>
+                    <div class="service-item">
+                        <div class="service-icon">
+                            <span>PT</span>
+                        </div>
+                        <div class="service-title">Product Testing</div>
+                    </div>
+                    <div class="service-item">
+                        <div class="service-icon">
+                            <span>NCD</span>
+                        </div>
+                        <div class="service-title">No-code Development</div>
+                    </div>
+                    <div class="service-item">
+                        <div class="service-icon">
+                            <span>MAD</span>
+                        </div>
+                        <div class="service-title">Mobile App Development</div>
+                    </div>
+                    <div class="service-item">
+                        <div class="service-icon">
+                            <span>WAD</span>
+                        </div>
+                        <div class="service-title">Web App Development</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slider Navigation Arrows -->
+        <div class="slider-arrow arrow-prev">&#10094;</div>
+        <div class="slider-arrow arrow-next">&#10095;</div>
+
+        <!-- Slider Navigation Dots -->
+        <div class="slider-nav">
+            <div class="nav-dot"></div>
+            <div class="nav-dot"></div>
+            <div class="nav-dot active"></div>
+            <div class="nav-dot"></div>
+            <div class="nav-dot"></div>
+            <div class="nav-dot"></div>
+        </div>
+    </div>
+
+    <!-- Contact Section -->
+    <div class="contact-section">
+        <div class="contact-heading">Send us your requirements, and get a response within 10 minutes</div>
+        <div class="contact-subheading">That's how we keep ourselves Faster than the Fastest</div>
+        <button class="contact-button" id="openModal">GET IN TOUCH</button>
+    </div>
+
+    <!-- Contact Form Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="modal-left">
+                <div>
+                    <h2 class="modal-heading">Send us a brief</h2>
+                    <p class="modal-subheading">Our team will get in touch with you within 10 Minutes!</p>
+                </div>
+                <div class="modal-icons">
+                    <div class="modal-icon">📊</div>
+                    <div class="modal-icon">📝</div>
+                    <div class="modal-icon">🖼️</div>
+                    <div class="modal-icon">📈</div>
+                    <div class="modal-icon">📁</div>
+                    <div class="modal-icon">💻</div>
+                    <div class="modal-icon">🔍</div>
+                    <div class="modal-icon">👥</div>
+                    <div class="modal-icon">📱</div>
+                    <div class="modal-icon">📊</div>
+                    <div class="modal-icon">💡</div>
+                    <div class="modal-icon highlighted-icon">⚡</div>
+                </div>
+            </div>
+            <div class="modal-right">
+                <div class="modal-close" id="closeModal">×</div>
+                <form id="contactForm">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Name" required>
+                    </div>
+                    <div class="form-group">
+                        <div class="phone-input">
+                            <div class="country-code">
+                                <img src="https://upload.wikimedia.org/wikipedia/en/thumb/a/a4/Flag_of_the_United_States.svg/1200px-Flag_of_the_United_States.svg.png" alt="US Flag">
+                                <span>+1</span>
+                            </div>
+                            <input type="tel" class="form-control phone-number" placeholder="Phone Number" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" class="form-control" placeholder="Email" required>
+                    </div>
+                    <div class="form-group">
+                        <select class="form-select" required>
+                            <option value="" disabled selected>Service</option>
+                            <option value="web-development">Web Development</option>
+                            <option value="mobile-app">Mobile App Development</option>
+                            <option value="data-analysis">Data Analysis</option>
+                            <option value="content-creation">Content Creation</option>
+                            <option value="design">Design Services</option>
+                        </select>
+                    </div>
+                    <div class="tag">
+                        <span>Visual Graphics</span>
+                        <span class="tag-close">×</span>
+                    </div>
+                    <div class="form-group">
+                        <textarea class="form-control" rows="4" placeholder="Message"></textarea>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="promo" checked>
+                        <label for="promo">I would like to receive promotional emails</label>
+                    </div>
+                    <button type="submit" class="submit-btn">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+<!-- Special Features Section -->
+    <section class="special-features-section">
+        <div class="special-features-container">
+            <div class="special-header">
+                <h2>What makes us so special?</h2>
+            </div>
+
+            <div class="ez-rule-container">
+                <div class="timeline-container">
+                    <div class="timeline-header">The 10-20-30 Rule at EZ</div>
+
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-time">10<span>Minutes</span></div>
+                            <div class="timeline-action">Acknowledge Request</div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-time">20<span>Minutes</span></div>
+                            <div class="timeline-action">Allocate Experts</div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-time">30<span>Minutes</span></div>
+                            <div class="timeline-action">Begin Assignment</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <i class="fas fa-star fa-lg"></i>
+                        <h3>Consistently High Quality</h3>
+                        <div class="feature-close">
+                            <i class="fas fa-times"></i>
+                        </div>
+                    </div>
+
+                    <div class="feature-card">
+                        <i class="fas fa-clock fa-lg"></i>
+                        <h3>Round the Clock Availability</h3>
+                        <div class="feature-close">
+                            <i class="fas fa-times"></i>
+                        </div>
+                    </div>
+
+                    <div class="feature-card">
+                        <i class="fas fa-bolt fa-lg"></i>
+                        <h3>Faster than the Fastest</h3>
+                        <div class="feature-close">
+                            <i class="fas fa-times"></i>
+                        </div>
+                    </div>
+
+                    <div class="feature-card">
+                        <i class="fas fa-shield-alt fa-lg"></i>
+                        <h3>Information Security</h3>
+                        <div class="feature-close">
+                            <i class="fas fa-times"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- WhatsApp Button -->
+    <a href="https://wa.me/123456789" class="whatsapp-button">
+        WhatsApp Us
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Slider functionality
+            const slides = document.querySelectorAll('.slide');
+            const dots = document.querySelectorAll('.nav-dot');
+            const prevBtn = document.querySelector('.arrow-prev');
+            const nextBtn = document.querySelector('.arrow-next');
+            const modalOverlay = document.getElementById('modalOverlay');
+            const openModalBtn = document.getElementById('openModal');
+            const closeModalBtn = document.getElementById('closeModal');
+
+            let currentIndex = 0;
+            const totalSlides = slides.length;
+
+            // Initialize the slide positions
+            updateSlides();
+            updateDots();
+
+            // Add event listeners to navigation dots
+            dots.forEach((dot, index) => {
+                dot.addEventListener('click', () => {
+                    currentIndex = index;
+                    updateSlides();
+                    updateDots();
+                });
+            });
+
+            // Add event listeners to navigation arrows
+            prevBtn.addEventListener('click', () => {
+                currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+                updateSlides();
+                updateDots();
+            });
+
+            nextBtn.addEventListener('click', () => {
+                currentIndex = (currentIndex + 1) % totalSlides;
+                updateSlides();
+                updateDots();
+            });
+
+            // Function to update slides
+            function updateSlides() {
+                slides.forEach((slide, index) => {
+                    slide.className = 'slide';
+
+                    if (index === currentIndex) {
+                        slide.classList.add('active');
+                    } else if (index === (currentIndex - 1 + totalSlides) % totalSlides) {
+                        slide.classList.add('prev');
+                    } else if (index === (currentIndex + 1) % totalSlides) {
+                        slide.classList.add('next');
+                    }
+                });
+            }
+
+            // Function to update navigation dots
+            function updateDots() {
+                dots.forEach((dot, index) => {
+                    dot.classList.toggle('active', index === currentIndex);
+                });
+            }
+
+            // Auto-advance the slider every 5 seconds
+            setInterval(() => {
+                currentIndex = (currentIndex + 1) % totalSlides;
+                updateSlides();
+                updateDots();
+            }, 5000);
+
+            // Modal functionality
+            openModalBtn.addEventListener('click', () => {
+                modalOverlay.classList.add('active');
+            });
+
+            closeModalBtn.addEventListener('click', () => {
+                modalOverlay.classList.remove('active');
+            });
+
+            // Close modal on outside click
+            modalOverlay.addEventListener('click', (e) => {
+                if (e.target === modalOverlay) {
+                    modalOverlay.classList.remove('active');
+                }
+            });
+
+            // Feature card close buttons
+            const featureCloseButtons = document.querySelectorAll('.feature-close');
+
+            featureCloseButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    const card = this.closest('.feature-card');
+                    if (card) {
+                        card.style.display = 'none';
+                    }
+                    e.stopPropagation();
+                });
+            }); 
+        });
+    </script>
+</body>
+</html>
